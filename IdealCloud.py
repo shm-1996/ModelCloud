@@ -25,7 +25,7 @@ import argparse
 parser = argparse.ArgumentParser(description='Options for idealised spherical cloud model.')
 parser.add_argument("-Sigma","--Sigma",type=float,default=3.2e3,help="The target mass surface density of the cloud in Solar Mass/parsec^2. Default is 3.2 x 10^3.")
 parser.add_argument("-alpha","--alpha",type=float,default=0,help="The power-law index such that density ~ r^{-alpha}. Default is zero, i.e. constant density sphere.")
-parser.add_argument("-epsilon","--epsilon",type=float,default=0,help="The fraction of mass in stars. Default is 70%.")
+parser.add_argument("-epsilon","--epsilon",type=float,default=0.7,help="The fraction of mass in stars. Default is 70%.")
 parser.add_argument("-show","--show",action='store_true',help="Flag to show the plots interactively before saving")
 args = parser.parse_args()
 
