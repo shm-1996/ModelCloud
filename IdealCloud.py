@@ -26,12 +26,14 @@ parser = argparse.ArgumentParser(description='Options for idealised spherical cl
 parser.add_argument("-Sigma","--Sigma",type=float,default=3.2e3,help="The target mass surface density of the cloud in Solar Mass/parsec^2. Default is 3.2 x 10^3.")
 parser.add_argument("-alpha","--alpha",type=float,default=0,help="The power-law index such that density ~ r^{-alpha}. Default is zero, i.e. constant density sphere.")
 parser.add_argument("-epsilon","--epsilon",type=float,default=0,help="The fraction of mass in stars. Default is 70%.")
+parser.add_argument("-show","--show",action='store_true',help="Flag to show the plots interactively before saving")
 args = parser.parse_args()
 
 #Set user parameters
 SigmaSolPc = args.Sigma # Surface density in Msol/pc^2
 rho_alpha = args.alpha #Density profile power law slope
-epsilon = args.epsilon # SFE            
+epsilon = args.epsilon # SFE
+show = args.show
 print("Input Values are: Sigma = {} Msol/pc^2 \t alpha = {} \t epsilon = {}".format(SigmaSolPc,rho_alpha,epsilon))
 
 ################################################################################
@@ -72,7 +74,7 @@ def find_exp(number) -> int:
     return abs(np.floor(base10))
 Sig_string = str(int(find_exp(SigmaSolPc)))
 Dens_string = str(int(rho_alpha))
-Model_Name = "Sigma{}_Dens{}".format(Sig_string,Dens_string)
+Model_Name = "Sigma{}_Dens{}_eps{}".format(Sig_string,Dens_string,epsilon)
 print("Model Name = {}".format(Model_Name))
 print("")
 
@@ -324,7 +326,8 @@ if __name__ == '__main__':
 
 
     axs[2].set_xlabel(r'$r/R_{\mathrm{cloud}}$')
-    plt.show(block=True)
+    if(show):
+        plt.show(block=True)
     fig.savefig("{}_profiles.pdf".format(Model_Name),bbox_inches='tight')
     plt.close(fig)
 
@@ -350,7 +353,8 @@ if __name__ == '__main__':
     #axs.plot(r_over_r0,g_total,lw=3.0,ls='--')
     axs.set_xlabel(r'$r/R_{\mathrm{cloud}}$')
     axs.set_ylabel(r'$f_{\mathrm{Edd}}$')
-    plt.show(block=True)
+    if(show):
+        plt.show(block=True)
     fig.savefig("{}_fEdd.pdf".format(Model_Name),bbox_inches='tight')
     plt.close(fig)
 
