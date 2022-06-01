@@ -25,12 +25,14 @@ import argparse
 parser = argparse.ArgumentParser(description='Options for idealised spherical cloud model.')
 parser.add_argument("-Sigma","--Sigma",type=float,default=3.2e3,help="The target mass surface density of the cloud in Solar Mass/parsec^2. Default is 3.2 x 10^3.")
 parser.add_argument("-alpha","--alpha",type=float,default=0,help="The power-law index such that density ~ r^{-alpha}. Default is zero, i.e. constant density sphere.")
+parser.add_argument("-epsilon","--epsilon",type=float,default=0,help="The fraction of mass in stars. Default is 70%.")
 args = parser.parse_args()
 
 #Set user parameters
 SigmaSolPc = args.Sigma # Surface density in Msol/pc^2
 rho_alpha = args.alpha #Density profile power law slope
-print("Input Values are: Sigma = {} Msol/pc^2 \t alpha = {}".format(SigmaSolPc,rho_alpha))
+epsilon = args.epsilon # SFE            
+print("Input Values are: Sigma = {} Msol/pc^2 \t alpha = {} \t epsilon = {}".format(SigmaSolPc,rho_alpha,epsilon))
 
 ################################################################################
 #First define some physical constants
@@ -43,7 +45,6 @@ G_GravityConstant = 6.67428e-08
 #Some fixed problem parameters
 specific_luminosity = 1.7e3             # erg s^-1 g^-1
 GMC_mass = 1.0e6 * Msun                 # g
-epsilon = 0.7                           # SFE
 M_g = (1 - epsilon) * GMC_mass      # Gas mass in cloud in g
 M_star = epsilon * GMC_mass      # Stellar mass in cloud in g
 L_star = M_star * specific_luminosity  # erg s^-1
