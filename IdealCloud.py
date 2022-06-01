@@ -333,19 +333,23 @@ if __name__ == '__main__':
 
     #Compute Eddington Ratio
 
-    #Compute gravitational forces
-    g_sink = M_star*G_GravityConstant/(r_over_r0*R_g)**2
-    g_self = np.zeros(np.size(r_over_r0))
-    for i,r in enumerate(r_over_r0):
-        g_self[i] = cumul_Mass(r*R_g,r_over_r0)
-    g_self *= G_GravityConstant/(r_over_r0*R_g)**2
-    g_total = g_self + g_sink
+    import warnings
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
 
-    #Radiation forces
-    f_rad = Frad(r_over_r0*R_g)*kappa/c
+        #Compute gravitational forces
+        g_sink = M_star*G_GravityConstant/(r_over_r0*R_g)**2
+        g_self = np.zeros(np.size(r_over_r0))
+        for i,r in enumerate(r_over_r0):
+            g_self[i] = cumul_Mass(r*R_g,r_over_r0)
+        g_self *= G_GravityConstant/(r_over_r0*R_g)**2
+        g_total = g_self + g_sink
 
-    #Eddington Ratio
-    fEdd = f_rad/g_total
+        #Radiation forces
+        f_rad = Frad(r_over_r0*R_g)*kappa/c
+
+        #Eddington Ratio
+        fEdd = f_rad/g_total
 
     #Plot this
     fig,axs = plt.subplots(ncols=1)
