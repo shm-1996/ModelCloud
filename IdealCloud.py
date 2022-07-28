@@ -26,6 +26,7 @@ parser = argparse.ArgumentParser(description='Options for idealised spherical cl
 parser.add_argument("-Sigma","--Sigma",type=float,default=3.2e3,help="The target mass surface density of the cloud in Solar Mass/parsec^2. Default is 3.2 x 10^3.")
 parser.add_argument("-alpha","--alpha",type=float,default=0,help="The power-law index such that density ~ r^{-alpha}. Default is zero, i.e. constant density sphere.")
 parser.add_argument("-epsilon","--epsilon",type=float,default=0.7,help="The fraction of mass in stars. Default is 70%.")
+parser.add_argument("-fdg","--fdg",type=float,default=1.0,help="The factor by which dust opacities are super-solar.")
 parser.add_argument("-show","--show",action='store_true',help="Flag to show the plots interactively before saving")
 args = parser.parse_args()
 
@@ -33,8 +34,9 @@ args = parser.parse_args()
 SigmaSolPc = args.Sigma # Surface density in Msol/pc^2
 rho_alpha = args.alpha #Density profile power law slope
 epsilon = args.epsilon # SFE
+fdustgas = args.fdg
 show = args.show
-print("Input Values are: Sigma = {} Msol/pc^2 \t alpha = {} \t epsilon = {}".format(SigmaSolPc,rho_alpha,epsilon))
+print("Input Values are: Sigma = {} Msol/pc^2 \t alpha = {} \t epsilon = {} \t fdustgas = {}".format(SigmaSolPc,rho_alpha,epsilon,fdustgas))
 
 ################################################################################
 #First define some physical constants
@@ -64,9 +66,9 @@ rmax = R_g
 rho_0 = M_g / ((4. / 3.) * np.pi * R_g * R_g * R_g)  # g cm^-3
 
 #Dust opacity law: options are fixed, semenov and plt - power law 
-kappalaw = "semenov"
+kappalaw = "fixed"
 #Value if using Uniform opacity
-kappa0 = 5.0           # specific opacity [cm^2 g^-1]
+kappa0 = 10.0           # specific opacity [cm^2 g^-1]
 
 #Construct the model name
 def find_exp(number) -> int:
@@ -74,7 +76,11 @@ def find_exp(number) -> int:
     return abs(np.floor(base10))
 Sig_string = str(int(find_exp(SigmaSolPc)))
 Dens_string = str(int(rho_alpha))
-Model_Name = "Sigma{}_Dens{}_eps{}".format(Sig_string,Dens_string,epsilon)
+
+if(fdustgas>1):
+    Model_Name = "Sigma{}_Dens{}_eps{}_fdg{}".format(Sig_string,Dens_string,epsilon,int(fdustgas))
+else:
+    Model_Name = "Sigma{}_Dens{}_eps{}".format(Sig_string,Dens_string,epsilon)
 print("Model Name = {}".format(Model_Name))
 print("")
 
@@ -97,13 +103,13 @@ def call_opacity(temp,rho):
 
 def get_kappa(r,f):
     #r is in dimensional units
-    if(kappalaw.lower() == "uniform"):
-        return kappa0
+    if(kappalaw.lower() == "fixed"):
+        return kappa0 * fdustgas
     #Power-law temperature dependence
     elif(kappalaw.lower() == "plt"):
         Er = Frad(r)/(c * f)
         Tr = (Er/a_rad)**0.25
-        return 10**(-1.5) * (Tr/10.0)**2
+        return 10**(-1.5) * (Tr/10.0)**2 * fdustgas
     #Semenov opacities
     elif(kappalaw.lower() == "semenov"):
         Er = Frad(r)/(c * f)
@@ -111,7 +117,7 @@ def get_kappa(r,f):
         Tr = min(max(5.0,Tr),1.e4)
         dens = rho(r)
         dens = min(max(dens,2.e-18),2.e-7)
-        return call_opacity(Tr,dens)
+        return call_opacity(Tr,dens) * fdustgas
 
 # solution for radiation flux F in cgs
 def Frad(r):
